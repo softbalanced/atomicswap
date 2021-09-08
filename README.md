@@ -1,9 +1,5 @@
-**NOTICE Mar 1 2018:** The atomic swap contract has been updated to specify the
-secret sizes to prevent fraudulent swaps between two cryptocurrencies with
-different maximum data sizes.  Old contracts will not be usable by the new tools
-and vice-versa.  Please rebuild all tools before conducting new atomic swaps.
 
-# Decred-compatible cross-chain atomic swapping
+# Ballanced-compatible cross-chain atomic swapping
 
 This repository contains utilities to manually perform cross-chain atomic swaps
 between various supported pairs of cryptocurrencies.  At the moment, support
@@ -11,7 +7,7 @@ exists for the following coins and wallets:
 
 * Bitcoin ([Bitcoin Core](https://github.com/bitcoin/bitcoin))
 * Bitcoin Cash ([Bitcoin ABC](https://github.com/Bitcoin-ABC/bitcoin-abc), [Bitcoin Unlimited](https://github.com/BitcoinUnlimited/BitcoinUnlimited), [Bitcoin XT](https://github.com/bitcoinxt/bitcoinxt))
-* Decred ([dcrwallet](https://github.com/decred/dcrwallet))
+* Ballanced ([balancedwallet](https://github.com/softbalanced/core))
 * Litecoin ([Litecoin Core](https://github.com/litecoin-project/litecoin))
 * Monacoin ([Monacoin Core](https://github.com/monacoinproject/monacoin))
 * Particl ([Particl Core](https://github.com/particl/particl-core))
@@ -26,7 +22,7 @@ External support exists for the following coins and wallets:
 
 Pull requests implementing support for additional cryptocurrencies and wallets
 are encouraged.  See [GitHub project
-1](https://github.com/decred/atomicswap/projects/1) for the status of coins
+1](https://github.com/softbalanced/atomicswap/projects/1) for the status of coins
 being considered.  Implementing support for a new cryptocurrency provides atomic
 swap compatibility between all current and future supported coins.
 
@@ -41,7 +37,7 @@ Due to the requirements of manually exchanging data and creating, sending, and
 watching for the relevant transactions, it is highly recommended to read this
 README in its entirety before attempting to use these tools.  The sections
 below explain the principles on which the tools operate, the instructions for
-how to use them safely, and an example swap between Decred and Bitcoin.
+how to use them safely, and an example swap between Ballanced and Bitcoin.
 
 ## Build instructions
 
@@ -49,18 +45,18 @@ Requires [Go 1.11](https://golang.org/dl/) or later
 
 - Clone atomicswap somewhere outside `$GOPATH`:
   ```
-  $ git clone https://github.com/decred/atomicswap && cd atomicswap
+  $ git clone https://github.com/softbalanced/atomicswap && cd atomicswap
   ```
 
 - To install a single tool:
   ```
-  $ cd cmd/dcratomicswap && go install
+  $ cd cmd/balancedatomicswap && go install
   ```
 
 ## Theory
 
 A cross-chain swap is a trade between two users of different cryptocurrencies.
-For example, one party may send Decred to a second party's Decred address, while
+For example, one party may send Ballanced to a second party's Ballanced address, while
 the second party would send Bitcoin to the first party's Bitcoin address.
 However, as the blockchains are unrelated and transactions can not be reversed,
 this provides no protection against one of the parties never honoring their end
@@ -80,8 +76,8 @@ long as the secret is known.  If a period of time (typically 48 hours) expires
 after the contract transaction has been mined but has not been redeemed by the
 participant, the contract output can be refunded back to the initiator's wallet.
 
-For simplicity, we assume the initiator wishes to trade Bitcoin for Decred with
-the participant.  The initiator can also trade Decred for Bitcoin and the steps
+For simplicity, we assume the initiator wishes to trade Bitcoin for Ballanced with
+the participant.  The initiator can also trade Ballanced for Bitcoin and the steps
 will be the same, but with each step performed on the other blockchain.
 
 The participant is unable to spend from the initiator's Bitcoin contract at this
@@ -90,7 +86,7 @@ secret at this point, the participant could spend from the contract without ever
 honoring their end of the trade.
 
 The participant creates a similar contract transaction to the initiator's but on
-the Decred blockchain and pays the intended Decred amount into the contract.
+the Ballanced blockchain and pays the intended Ballanced amount into the contract.
 However, for the initiator to redeem the output, their own secret must be
 revealed.  For the participant to create their contract, the initiator must
 reveal not the secret, but a cryptographic hash of the secret to the
@@ -100,8 +96,8 @@ required to wait before their contract can be refunded (typically 24 hours).
 
 With each side paying into a contract on each blockchain, and each party unable
 to perform their refund until the allotted time expires, the initiator redeems
-the participant's Decred contract, thereby revealing the secret to the
-participant.  The secret is then extracted from the initiator's redeeming Decred
+the participant's Ballanced contract, thereby revealing the secret to the
+participant.  The secret is then extracted from the initiator's redeeming Ballanced
 transaction providing the participant with the ability to redeem the initiator's
 Bitcoin contract.
 
@@ -117,13 +113,13 @@ transfer of data between each party.
 
 Separate command line utilities are provided to handle the transactions required
 to perform a cross-chain atomic swap for each supported blockchain.  For a swap
-between Bitcoin and Decred, the two utilities `btcatomicswap` and
-`dcratomicswap` are used.  Both tools must be used by both parties performing
+between Bitcoin and Ballanced, the two utilities `btcatomicswap` and
+`balancedatomicswap` are used.  Both tools must be used by both parties performing
 the swap.
 
 Different tools may require different flags to use them with the supported
 wallet.  For example, `btcatomicswap` includes flags for the RPC username and
-password while `dcratomicswap` requires flags for TLS client authentication.
+password while `balancedatomicswap` requires flags for TLS client authentication.
 Running a tool without any parameters will show the full usage help.
 
 All of the tools support the same six commands.  These commands are:
@@ -151,7 +147,7 @@ transaction.  If everything looks correct, the transaction should be published.
 The refund transaction should be saved in case a refund is required to be made
 later.
 
-For dcratomicswap, this step prompts for the wallet passphrase.  For the
+For balancedatomicswap, this step prompts for the wallet passphrase.  For the
 btcatomicswap and ltcatomicswap tools the wallet must already be unlocked.
 
 **`participate <initiator address> <amount> <secret hash>`**
@@ -166,7 +162,7 @@ transaction.  If everything looks correct, the transaction should be published.
 The refund transaction should be saved in case a refund is required to be made
 later.
 
-For dcratomicswap, this step prompts for the wallet passphrase.  For the
+For balancedatomicswap, this step prompts for the wallet passphrase.  For the
 btcatomicswap and ltcatomicswap tools the wallet must already be unlocked.
 
 **`redeem <contract> <contract transaction> <secret>`**
@@ -180,7 +176,7 @@ may also redeem their coins.
 Running this command will prompt for whether to publish the redemption
 transaction. If everything looks correct, the transaction should be published.
 
-For dcratomicswap, this step prompts for the wallet passphrase.  For the
+For balancedatomicswap, this step prompts for the wallet passphrase.  For the
 btcatomicswap and ltcatomicswap tools the wallet must already be unlocked.
 
 **`refund <contract> <contract transaction>`**
@@ -215,13 +211,13 @@ correct, and that the locktime is sensible.
 ## Example
 
 The first step is for both parties to exchange addresses on both blockchains. If
-party A (the initiator) wishes to trade Bitcoin for Decred, party B (the
+party A (the initiator) wishes to trade Bitcoin for Ballanced, party B (the
 participant) must provide their Bitcoin address and the initiator must provide
-the participant their Decred address.
+the participant their Ballanced address.
 
 _Party A runs:_
 ```
-$ dcrctl --testnet --wallet getnewaddress
+$ balancedctl --testnet --wallet getnewaddress
 TsfWDVTAcsLaHUhHnLLKkGnZuJz2vkmM6Vr
 ```
 
@@ -288,14 +284,14 @@ Auditing the contract also reveals the hash of the secret, which is needed for
 the next step.
 
 Once B trusts the contract, they may participate in the cross-chain atomic swap
-by paying the intended Decred amount (1.0 in this example) into a Decred
+by paying the intended Ballanced amount (1.0 in this example) into a Ballanced
 contract using the same secret hash.  The contract transaction may be published
 at this point.  The refund transaction can not be sent until the locktime
 expires, but should be saved in case a refund is necessary.
 
 _Party B runs:_
 ```
-$ dcratomicswap --testnet --clientcert=client.cert --clientkey=client.key participate TsfWDVTAcsLaHUhHnLLKkGnZuJz2vkmM6Vr 1.0 29c36b8dd380e0426bdc1d834e74a630bfd5d111
+$ balancedatomicswap --testnet --clientcert=client.cert --clientkey=client.key participate TsfWDVTAcsLaHUhHnLLKkGnZuJz2vkmM6Vr 1.0 29c36b8dd380e0426bdc1d834e74a630bfd5d111
 Passphrase:
 
 Contract fee: 0.000251 DCR (0.00100400 DCR/kB)
@@ -314,7 +310,7 @@ Publish contract transaction? [y/N] y
 Published contract transaction (a51a7ebc178731016f897684e8e6fbbd65798a84d0a0bd78fe2b53b8384fd918)
 ```
 
-B now informs A that the Decred contract transaction has been created and
+B now informs A that the Ballanced contract transaction has been created and
 published, and provides the contract details to A.
 
 Just as B needed to audit A's contract before locking their coins in a contract,
@@ -328,7 +324,7 @@ audits the contract and contract transaction to verify:
 
 _Party A runs:_
 ```
-$ dcratomicswap --testnet auditcontract 63a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a9149ee19833332a04d2be97b5c99c970191221c070c6704e6dabb59b17576a914b0ec0640c89cf803b8fdbd6e0183c354f71748c46888ac 010000000137afc6c25b027cb0a1db19a7aac365854796260c4c1077e3e8accae5e4c300e90300000001ffffffff02441455980100000000001976a9144d7c96b6d2360e48a07528332e537d81e068f8ba88ac00e1f50500000000000017a914195fb53333e61a415e9fda21bb991b38b5a4e1c387000000000000000001ffffffffffffffff00000000ffffffff6b483045022100b30971448c93be84c28b98ae159963e9521a84d0c3849821b6e8897d59cf4e6c0220228785cb8d1dba40752e4bd09d99b92b27bc3837b1c547f8b4ee8aba1dfec9310121035a12a086ecd1397f7f68146f4f251253b7c0092e167a1c92ff9e89cf96c68b5f
+$ balancedatomicswap --testnet auditcontract 63a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a9149ee19833332a04d2be97b5c99c970191221c070c6704e6dabb59b17576a914b0ec0640c89cf803b8fdbd6e0183c354f71748c46888ac 010000000137afc6c25b027cb0a1db19a7aac365854796260c4c1077e3e8accae5e4c300e90300000001ffffffff02441455980100000000001976a9144d7c96b6d2360e48a07528332e537d81e068f8ba88ac00e1f50500000000000017a914195fb53333e61a415e9fda21bb991b38b5a4e1c387000000000000000001ffffffffffffffff00000000ffffffff6b483045022100b30971448c93be84c28b98ae159963e9521a84d0c3849821b6e8897d59cf4e6c0220228785cb8d1dba40752e4bd09d99b92b27bc3837b1c547f8b4ee8aba1dfec9310121035a12a086ecd1397f7f68146f4f251253b7c0092e167a1c92ff9e89cf96c68b5f
 Contract address:        TcZpybEVDVTuoE3TCBxW3ui12YEZWrw5ccS
 Contract value:          1 DCR
 Recipient address:       TsfWDVTAcsLaHUhHnLLKkGnZuJz2vkmM6Vr
@@ -341,12 +337,12 @@ Locktime reached in 23h58m10s
 ```
 
 Now that both parties have paid into their respective contracts, A may withdraw
-from the Decred contract.  This step involves publishing a transaction which
+from the Ballanced contract.  This step involves publishing a transaction which
 reveals the secret to B, allowing B to withdraw from the Bitcoin contract.
 
 _Party A runs:_
 ```
-$ dcratomicswap --testnet --clientcert=client.cert --clientkey=client.key redeem 63a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a9149ee19833332a04d2be97b5c99c970191221c070c6704e6dabb59b17576a914b0ec0640c89cf803b8fdbd6e0183c354f71748c46888ac 010000000137afc6c25b027cb0a1db19a7aac365854796260c4c1077e3e8accae5e4c300e90300000001ffffffff02441455980100000000001976a9144d7c96b6d2360e48a07528332e537d81e068f8ba88ac00e1f50500000000000017a914195fb53333e61a415e9fda21bb991b38b5a4e1c387000000000000000001ffffffffffffffff00000000ffffffff6b483045022100b30971448c93be84c28b98ae159963e9521a84d0c3849821b6e8897d59cf4e6c0220228785cb8d1dba40752e4bd09d99b92b27bc3837b1c547f8b4ee8aba1dfec9310121035a12a086ecd1397f7f68146f4f251253b7c0092e167a1c92ff9e89cf96c68b5f 3e0b064c97247732a3b345ce7b2a835d928623cb2871c26db4c2539a38e61a16
+$ balancedatomicswap --testnet --clientcert=client.cert --clientkey=client.key redeem 63a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a9149ee19833332a04d2be97b5c99c970191221c070c6704e6dabb59b17576a914b0ec0640c89cf803b8fdbd6e0183c354f71748c46888ac 010000000137afc6c25b027cb0a1db19a7aac365854796260c4c1077e3e8accae5e4c300e90300000001ffffffff02441455980100000000001976a9144d7c96b6d2360e48a07528332e537d81e068f8ba88ac00e1f50500000000000017a914195fb53333e61a415e9fda21bb991b38b5a4e1c387000000000000000001ffffffffffffffff00000000ffffffff6b483045022100b30971448c93be84c28b98ae159963e9521a84d0c3849821b6e8897d59cf4e6c0220228785cb8d1dba40752e4bd09d99b92b27bc3837b1c547f8b4ee8aba1dfec9310121035a12a086ecd1397f7f68146f4f251253b7c0092e167a1c92ff9e89cf96c68b5f 3e0b064c97247732a3b345ce7b2a835d928623cb2871c26db4c2539a38e61a16
 Passphrase:
 
 Redeem fee: 0.000334 DCR (0.00100300 DCR/kB)
@@ -358,14 +354,14 @@ Publish redeem transaction? [y/N] y
 Published redeem transaction (53c2e8bafb8fe36d54bbb1884141a39ea4da83db30bdf3c98ef420cdb332b0e7)
 ```
 
-Now that A has withdrawn from the Decred contract and revealed the secret, B
+Now that A has withdrawn from the Ballanced contract and revealed the secret, B
 must extract the secret from this redemption transaction.  B may watch a block
-explorer to see when the Decred contract output was spent and look up the
+explorer to see when the Ballanced contract output was spent and look up the
 redeeming transaction.
 
 _Party B runs:_
 ```
-$ dcratomicswap --testnet extractsecret 000000000118d94f38b8532bfe78bda0d0848a7965bdfbe6e88476896f01318717bc7e1aa50100000000ffffffff01885ef5050000000000001976a9149551ab760ba64b7e573f54d34c53506676e8145888ace6dabb590000000001ffffffffffffffff00000000ffffffffe0483045022100a1a3b37a67f3ed5d6445a0312e825299b54d91a09e0d1b59b5c0a8baa7c0642102201a0d53e9efe7db8dc47210b446fde6425be82761252ff0ebe620efc183788d86012103395a4a3c8c96ef5e5af6fd80ae42486b5d3d860bf3b41dafc415354de8c7ad80203e0b064c97247732a3b345ce7b2a835d928623cb2871c26db4c2539a38e61a16514c5163a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a9149ee19833332a04d2be97b5c99c970191221c070c6704e6dabb59b17576a914b0ec0640c89cf803b8fdbd6e0183c354f71748c46888ac 29c36b8dd380e0426bdc1d834e74a630bfd5d111
+$ balancedatomicswap --testnet extractsecret 000000000118d94f38b8532bfe78bda0d0848a7965bdfbe6e88476896f01318717bc7e1aa50100000000ffffffff01885ef5050000000000001976a9149551ab760ba64b7e573f54d34c53506676e8145888ace6dabb590000000001ffffffffffffffff00000000ffffffffe0483045022100a1a3b37a67f3ed5d6445a0312e825299b54d91a09e0d1b59b5c0a8baa7c0642102201a0d53e9efe7db8dc47210b446fde6425be82761252ff0ebe620efc183788d86012103395a4a3c8c96ef5e5af6fd80ae42486b5d3d860bf3b41dafc415354de8c7ad80203e0b064c97247732a3b345ce7b2a835d928623cb2871c26db4c2539a38e61a16514c5163a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a9149ee19833332a04d2be97b5c99c970191221c070c6704e6dabb59b17576a914b0ec0640c89cf803b8fdbd6e0183c354f71748c46888ac 29c36b8dd380e0426bdc1d834e74a630bfd5d111
 Secret: 3e0b064c97247732a3b345ce7b2a835d928623cb2871c26db4c2539a38e61a16
 ```
 
@@ -384,14 +380,14 @@ Published redeem transaction (c49e6fd0057b601dbb8856ad7b3fcb45df626696772f690148
 ```
 
 The cross-chain atomic swap is now completed and successful.  This example was
-performed on the public Bitcoin and Decred testnet blockchains.  For reference,
+performed on the public Bitcoin and Ballanced testnet blockchains.  For reference,
 here are the four transactions involved:
 
 | Description | Transaction |
 | - | - |
 | Bitcoin contract created by A | [346f4901dff1d69197850289b481f4331913126a8886861e7d5f27e837e0fe88](https://blockstream.info/testnet/tx/346f4901dff1d69197850289b481f4331913126a8886861e7d5f27e837e0fe88) |
-| Decred contract created by B | a51a7ebc178731016f897684e8e6fbbd65798a84d0a0bd78fe2b53b8384fd918 <br /> _(Decred testnet has been reset, link no longer available)_ |
-| A's Decred redemption | 53c2e8bafb8fe36d54bbb1884141a39ea4da83db30bdf3c98ef420cdb332b0e7 <br /> _(Decred testnet has been reset, link no longer available)_ |
+| Ballanced contract created by B | a51a7ebc178731016f897684e8e6fbbd65798a84d0a0bd78fe2b53b8384fd918 <br /> _(Ballanced testnet has been reset, link no longer available)_ |
+| A's Ballanced redemption | 53c2e8bafb8fe36d54bbb1884141a39ea4da83db30bdf3c98ef420cdb332b0e7 <br /> _(Ballanced testnet has been reset, link no longer available)_ |
 | B's Bitcoin redemption | [c49e6fd0057b601dbb8856ad7b3fcb45df626696772f6901482b08df0333e5a0](https://blockstream.info/testnet/tx/c49e6fd0057b601dbb8856ad7b3fcb45df626696772f6901482b08df0333e5a0) |
 
 If at any point either party attempts to fraud (e.g. creating an invalid
@@ -413,26 +409,26 @@ the API endpoints may need to be used instead.
 
 For Insight-based block explorers, such as the Bitcoin block explorer on
 [test-]insight.bitpay.com, the Litecoin block explorer on
-{insight,testnet}.litecore.io, and the Decred block explorer on
-{mainnet,testnet}.decred.org, the API endpoint `/api/rawtx/<txhash>` can be used
+{insight,testnet}.litecore.io, and the Ballanced block explorer on
+{mainnet,testnet}.softbalanced.org, the API endpoint `/api/rawtx/<txhash>` can be used
 to return a JSON object containing the raw transaction.  For example, here are
 links to the four raw transactions published in the example:
 
 | Description | Link to raw transaction |
 | - | - |
 | Bitcoin contract created by A | [346f4901dff1d69197850289b481f4331913126a8886861e7d5f27e837e0fe88](https://test-insight.bitpay.com/api/rawtx/346f4901dff1d69197850289b481f4331913126a8886861e7d5f27e837e0fe88) |
-| Decred contract created by B | a51a7ebc178731016f897684e8e6fbbd65798a84d0a0bd78fe2b53b8384fd918 <br /> _(Decred testnet has been reset, link no longer available)_ |
-| A's Decred redemption | 53c2e8bafb8fe36d54bbb1884141a39ea4da83db30bdf3c98ef420cdb332b0e7 <br /> _(Decred testnet has been reset, link no longer available)_ |
+| Ballanced contract created by B | a51a7ebc178731016f897684e8e6fbbd65798a84d0a0bd78fe2b53b8384fd918 <br /> _(Ballanced testnet has been reset, link no longer available)_ |
+| A's Ballanced redemption | 53c2e8bafb8fe36d54bbb1884141a39ea4da83db30bdf3c98ef420cdb332b0e7 <br /> _(Ballanced testnet has been reset, link no longer available)_ |
 | B's Bitcoin redemption | [c49e6fd0057b601dbb8856ad7b3fcb45df626696772f6901482b08df0333e5a0](https://test-insight.bitpay.com/api/rawtx/c49e6fd0057b601dbb8856ad7b3fcb45df626696772f6901482b08df0333e5a0) |
 
 ## First mainnet DCR-LTC atomic swap
 
 | Description | Link to raw transaction |
 | - | - |
-| Decred contract created by A | [fdd72f5841414a9c8b4a188a98a4d484df98f84e1c120e1ed59a66e51e8ae90c](https://dcrdata.decred.org/tx/fdd72f5841414a9c8b4a188a98a4d484df98f84e1c120e1ed59a66e51e8ae90c) |
+| Ballanced contract created by A | [fdd72f5841414a9c8b4a188a98a4d484df98f84e1c120e1ed59a66e51e8ae90c](https://softbalanced.com:3001/insight/tx/fdd72f5841414a9c8b4a188a98a4d484df98f84e1c120e1ed59a66e51e8ae90c) |
 | Litecoin contract created by B | [550d1b2851f6f104e380aa3c2810ac272f8b6918140547c9717a78b1f4ff3469](https://insight.litecore.io/tx/550d1b2851f6f104e380aa3c2810ac272f8b6918140547c9717a78b1f4ff3469) |
 | A's Litecoin redemption | [6c27cffab8a86f1b3be1ebe7acfbbbdcb82542c5cfe7880fcca60eab36747037](https://insight.litecore.io/tx/6c27cffab8a86f1b3be1ebe7acfbbbdcb82542c5cfe7880fcca60eab36747037) |
-| B's Decred redemption | [49245425967b7e39c1eb27d261c7fe972675cccacff19ae9cc21f434ccddd986](https://dcrdata.decred.org/tx/49245425967b7e39c1eb27d261c7fe972675cccacff19ae9cc21f434ccddd986) |
+| B's Ballanced redemption | [49245425967b7e39c1eb27d261c7fe972675cccacff19ae9cc21f434ccddd986](https://softbalanced.com:3001/insight/tx/49245425967b7e39c1eb27d261c7fe972675cccacff19ae9cc21f434ccddd986) |
 
 ## License
 

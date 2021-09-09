@@ -436,7 +436,7 @@ func createSig(tx *wire_btc.MsgTx, idx int, pkScript []byte, addr btcutil.Addres
 // btcd/rpcclient package.
 func fundRawTransaction(c *rpcclient_dash.Client, tx *wire_btc.MsgTx, feePerKb btcutil.Amount) (fundedTx *wire_btc.MsgTx, fee btcutil.Amount, err error) {
 
-fmt.Printf("%q", "fundRawTransaction/n")
+
 
 	var buf bytes.Buffer
 	buf.Grow(tx.SerializeSize())
@@ -457,7 +457,7 @@ fmt.Printf("%q", "fundRawTransaction/n")
 	
 	rawResp, err := c.RawRequest("fundrawtransaction", params)
 	                              
-fmt.Printf("%q", "fundrawtransaction/n")								  
+								  
 
 
 	if err != nil {
@@ -473,7 +473,7 @@ fmt.Printf("%q", "fundrawtransaction/n")
 		return nil, 0, err
 	}
 	
-fmt.Printf("%q", "fundrawtransaction hex\n")								  	
+								  	
 	fundedTxBytes, err := hex.DecodeString(resp.Hex)
 	if err != nil {
 		return nil, 0, err
@@ -488,7 +488,7 @@ fmt.Printf("%q", "fundrawtransaction hex\n")
 		return nil, 0, err
 	}
 	
-fmt.Printf("%q", "fundrawtransaction fundedTx hex\n")								  		
+								  		
 	return fundedTx, feeAmount, nil
 }
 
@@ -736,7 +736,7 @@ func buildContract(c *rpcclient_dash.Client, args *contractArgs) (*builtContract
 	}
 
 
- fmt.Printf("%q", "getFeePerKb")
+
  
 	unsignedContract := wire_btc.NewMsgTx(txVersion)
 	unsignedContract.AddTxOut(wire_btc.NewTxOut(int64(args.amount), contractP2SHPkScript))
